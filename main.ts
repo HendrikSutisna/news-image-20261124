@@ -1,30 +1,23 @@
-import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+// news-image-20261124 entry v3 (Node 22, standard library only): the image
+// is the entry.png beside this file, and the program copies it to
+// /output/entry.png, then verifies the copy is byte-identical to the source.
+//
+// Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
+//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-// Copy the pre-rendered newspaper image to the harness output directory,
-// then verify the copy before reporting success. A truncated or partial
-// copy must fail loudly instead of silently scoring a corrupt image.
-const here = dirname(fileURLToPath(import.meta.url));
-const source = join(here, "entry.png");
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "out";
-const target = join(outDir, "entry.png");
+import { copyFileSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-mkdirSync(outDir, { recursive: true });
-copyFileSync(source, target);
+const sourcePath = fileURLToPath(new URL('./entry.png', import.meta.url));
+const targetPath = join(process.env.MAKEFUN_OUTPUT_DIR ?? '/output', 'entry.png');
 
-// Verify: the output must exist and be byte-identical to the source.
-if (!existsSync(target)) {
-  console.error(`error: output file missing after copy: ${target}`);
-  process.exit(1);
+copyFileSync(sourcePath, targetPath);
+
+const sha256 = (path: string): string =>
+  createHash('sha256').update(readFileSync(path)).digest('hex');
+
+if (sha256(sourcePath) !== sha256(targetPath)) {
+  throw new Error('entry.png copy is not byte-identical');
 }
-const sourceBytes = readFileSync(source);
-const targetBytes = readFileSync(target);
-if (sourceBytes.length !== targetBytes.length || !sourceBytes.equals(targetBytes)) {
-  console.error(
-    `error: output verification failed: ${target} (${targetBytes.length} bytes) ` +
-      `does not match ${source} (${sourceBytes.length} bytes)`,
-  );
-  process.exit(1);
-}
-console.log(`wrote ${target} (${targetBytes.length} bytes, verified)`);

@@ -3,8 +3,9 @@
 A newspaper front page summing up Tuesday 24 November 2026: a fourth tanker
 hit by a mine in the Strait of Hormuz (per the IRGC, claim unverified),
 Israel killing a Hamas security chief in Gaza, a Russian strike on
-Zaporizhzhia, the Banten candy factory fire toll reaching 26, and
-Pakistan's first man in space aboard Shenzhou-24.
+Zaporizhzhia, Democrats winning their 259th House seat as the AP calls
+Tennessee for Victoria Broderick, and Pakistan's first man in space
+aboard Shenzhou-24.
 
 ## make.fun
 
